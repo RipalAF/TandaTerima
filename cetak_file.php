@@ -9,11 +9,15 @@ if (!isset($_GET['id'])) {
 $id = $_GET['id'];
 
 $query = $conn->query("
-    SELECT penerima.*, ditujukan.nama_penerima 
+    SELECT penerima.*, ditujukan.sebutan, ditujukan.nama_penerima 
     FROM penerima 
-    JOIN ditujukan ON penerima.id = ditujukan.id
+    LEFT JOIN ditujukan ON penerima.ditunjukan = ditujukan.id
     WHERE penerima.id = $id
 ");
+
+if ($query->num_rows === 0) {
+    die("Query berhasil dijalankan, tapi tidak ada hasil. ID: $id");
+}
 $data = $query->fetch_assoc();
 
 if (!$data) {
@@ -77,10 +81,18 @@ function formatTanggalIndonesia($tanggal) {
                     <?php echo nl2br(htmlspecialchars($data['berupa'])); ?>
                 </p>
             </div>
-            <div class="flex items-center mt-2">
+                        <div class="flex items-center mt-2">
                 <p class="text-sm font-semibold w-40">Ditujukan kepada</p>
                 <p class="w-4 text-left text-sm">:</p>
-                <p class="text-sm flex-1"><?php echo htmlspecialchars($data['nama_penerima']); ?></p>
+                <p class="text-sm flex-1">
+                    <?php 
+                        if (!empty($data['sebutan']) && !empty($data['nama_penerima'])) {
+                            echo htmlspecialchars($data['sebutan']) . ' ' . htmlspecialchars($data['nama_penerima']);
+                        } else {
+                            echo 'Data tidak ditemukan';
+                        }
+                    ?>
+                </p>
             </div>
             <div class="flex items-center mt-2">
                 <p class="text-sm font-semibold w-40">Hari/Tanggal</p>
@@ -104,7 +116,6 @@ function formatTanggalIndonesia($tanggal) {
                 </p>
             </div>
         </div>
-    
         <p class="text-center text-sm mt-4 border-t pt-4 border-black print-footer">
             Gedung Pelni Kemayoran - Jakarta Pusat | Phone: (021) 42883720 - 42883749 | 
             Email: corporate@pidc.co.id / pt.pidc@gmail.com | Website: pelniservices.com

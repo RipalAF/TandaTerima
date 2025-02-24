@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
+    header("Location: ./auth/login.php");
     exit();
 }
 
@@ -9,18 +9,25 @@ include './auth/koneksi.php';
 
 // Ambil data dari database dengan pencarian jika ada
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-$query = $conn->query("
-    SELECT penerima.*, ditujukan.nama_penerima AS nama_ditujukan 
+$sql = "
+    SELECT penerima.*, ditujukan.nama_penerima, ditujukan.sebutan 
     FROM penerima 
-    LEFT JOIN ditujukan ON penerima.id = ditujukan.id
-    WHERE penerima.berupa LIKE '%$search%' OR penerima.penerima LIKE '%$search%'
-");
+    LEFT JOIN ditujukan ON penerima.ditunjukan = ditujukan.id
+    WHERE penerima.berupa LIKE ? OR penerima.penerima LIKE ?
+";
 
+$stmt = $conn->prepare($sql);
+$search_param = "%$search%";
+$stmt->bind_param("ss", $search_param, $search_param);
+$stmt->execute();
+$query = $stmt->get_result();
 
 // Hapus data jika ada request delete
 if (isset($_GET['hapus'])) {
     $id = $_GET['hapus'];
-    $conn->query("DELETE FROM penerima WHERE id=$id");
+    $delete_stmt = $conn->prepare("DELETE FROM penerima WHERE id = ?");
+    $delete_stmt->bind_param("i", $id);
+    $delete_stmt->execute();
     header("Location: index.php");
     exit();
 }
@@ -75,7 +82,7 @@ if (isset($_GET['hapus'])) {
         <th class="py-2 px-4 border">Ditunjukan</th>
         <th class="py-2 px-4 border">Hari/Tanggal</th>
         <th class="py-2 px-4 border">Penerima</th>
-        <th class="py-2 px-4 border">File</th> <!-- Tambahkan kolom File -->
+        <th class="py-2 px-4 border">File</th>
         <th class="py-2 px-4 border">Aksi</th>
     </tr>
 </thead>
@@ -86,7 +93,10 @@ if (isset($_GET['hapus'])) {
     <tr class="border-b hover:bg-gray-100 transition">
         <td class="py-2 px-4 border text-center"><?php echo $no++; ?></td>
         <td class="py-2 px-4 border"><?php echo nl2br($row['berupa']); ?></td>
-        <td class="py-2 px-4 border"><?php echo $row['nama_ditujukan']; ?></td>
+        <td class="py-2 px-4 border">
+    <?php echo (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . $row['nama_penerima']; ?>
+</td>
+
         <td class="py-2 px-4 border text-center"><?php echo date('d-m-Y', strtotime($row['hari_tanggal'])); ?></td>
         <td class="py-2 px-4 border"><?php echo $row['penerima']; ?></td>
         <td class="py-2 px-4 border text-center">
