@@ -13,10 +13,10 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
-$id = $_GET['id'];
+$id = intval($_GET['id']); // Pastikan ID adalah angka
 
 // Ambil data berdasarkan ID dan JOIN dengan tabel ditujukan
-$query = $conn->query("SELECT penerima.*, ditujukan.nama_penerima 
+$query = $conn->query("SELECT penerima.*, ditujukan.id AS id_ditujukan, ditujukan.nama_penerima 
                         FROM penerima 
                         JOIN ditujukan ON penerima.ditunjukan = ditujukan.id 
                         WHERE penerima.id=$id");
@@ -28,14 +28,16 @@ if (!$data) {
     exit();
 }
 
+// Ambil daftar ditujukan untuk dropdown
+$ditujukan_result = $conn->query("SELECT id, nama_penerima FROM ditujukan");
+
 // Proses update data jika form dikirimkan
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $berupa = str_replace("\n", "<br>", $_POST['berupa']); // Simpan dengan format newline ke <br>
-    $ditunjukan = $_POST['ditunjukan'];
+    $ditunjukan = intval($_POST['ditunjukan']); // Pastikan ditujukan berupa angka
     $hari_tanggal = $_POST['hari_tanggal'];
-    $penerima = $_POST['penerima'];
 
-    $sql = "UPDATE penerima SET berupa='$berupa', ditunjukan='$ditunjukan', hari_tanggal='$hari_tanggal', penerima='$penerima' WHERE id=$id";
+    $sql = "UPDATE penerima SET berupa='$berupa', ditunjukan='$ditunjukan', hari_tanggal='$hari_tanggal' WHERE id=$id";
     
     if ($conn->query($sql)) {
         header("Location: index.php");
@@ -69,19 +71,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div>
                 <label class="block text-gray-700 font-semibold">Ditujukan:</label>
-                <input type="text" name="ditunjukan" value="<?= htmlspecialchars($data['nama_penerima']); ?>" required
-                    class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <select name="ditunjukan" required class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="">-- Pilih Ditujukan --</option>
+                    <?php
+                    $result = $conn->query("SELECT id, nama_penerima FROM ditujukan");
+                    while ($row = $result->fetch_assoc()) {
+                        $selected = ($row['id'] == $data['ditunjukan']) ? "selected" : "";
+                        echo "<option value='{$row['id']}' $selected>{$row['nama_penerima']}</option>";
+                    }
+                    ?>
+                </select>
             </div>
 
             <div>
                 <label class="block text-gray-700 font-semibold">Hari/Tanggal:</label>
                 <input type="date" name="hari_tanggal" value="<?= htmlspecialchars($data['hari_tanggal']); ?>" required
-                    class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-            </div>
-
-            <div>
-                <label class="block text-gray-700 font-semibold">Penerima:</label>
-                <input type="text" name="penerima" value="<?= htmlspecialchars($data['penerima']); ?>" required
                     class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
 

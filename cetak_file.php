@@ -6,19 +6,40 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
-$id = $_GET['id'];
+$hash_id = $_GET['id'];
 
-$query = $conn->query("
+// Cari ID asli berdasarkan hash
+$query = "SELECT id FROM penerima";
+$result = $conn->query($query);
+
+$id_asli = null;
+while ($row = $result->fetch_assoc()) {
+    if (sha1($row['id']) === $hash_id) {
+        $id_asli = $row['id'];
+        break;
+    }
+}
+
+// Jika tidak ditemukan, tampilkan error
+if ($id_asli === null) {
+    die("Data tidak ditemukan!");
+}
+
+// Query untuk mengambil data berdasarkan ID asli
+$query = $conn->prepare("
     SELECT penerima.*, ditujukan.sebutan, ditujukan.nama_penerima 
     FROM penerima 
     LEFT JOIN ditujukan ON penerima.ditunjukan = ditujukan.id
-    WHERE penerima.id = $id
+    WHERE penerima.id = ?
 ");
+$query->bind_param("i", $id_asli);
+$query->execute();
+$result = $query->get_result();
 
-if ($query->num_rows === 0) {
-    die("Query berhasil dijalankan, tapi tidak ada hasil. ID: $id");
+if ($result->num_rows === 0) {
+    die("Query berhasil dijalankan, tapi tidak ada hasil. ID: $id_asli");
 }
-$data = $query->fetch_assoc();
+$data = $result->fetch_assoc();
 
 if (!$data) {
     echo "Data tidak ditemukan!";
@@ -61,7 +82,7 @@ function formatTanggalIndonesia($tanggal) {
         };
     </script>
 </head>
-<body class="p-10 bg-gray-100 ">
+<body class="p-10 bg-gray-100">
     <div class="bg-white p-10 shadow-lg rounded-lg w-full mx-auto border border-black">
         <div class="flex justify-between items-center mb-3">
             <img src="images/akhlak-logo.png" alt="Logo Kiri" class="h-24">
@@ -81,7 +102,7 @@ function formatTanggalIndonesia($tanggal) {
                     <?php echo nl2br(htmlspecialchars($data['berupa'])); ?>
                 </p>
             </div>
-                        <div class="flex items-center mt-2">
+            <div class="flex items-center mt-2">
                 <p class="text-sm font-semibold w-40">Ditujukan kepada</p>
                 <p class="w-4 text-left text-sm">:</p>
                 <p class="text-sm flex-1">

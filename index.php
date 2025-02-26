@@ -13,12 +13,14 @@ $sql = "
     SELECT penerima.*, ditujukan.nama_penerima, ditujukan.sebutan 
     FROM penerima 
     LEFT JOIN ditujukan ON penerima.ditunjukan = ditujukan.id
-    WHERE penerima.berupa LIKE ? OR penerima.penerima LIKE ?
+    WHERE penerima.berupa LIKE ?
+    ORDER BY penerima.hari_tanggal DESC
 ";
+
 
 $stmt = $conn->prepare($sql);
 $search_param = "%$search%";
-$stmt->bind_param("ss", $search_param, $search_param);
+$stmt->bind_param("s", $search_param);
 $stmt->execute();
 $query = $stmt->get_result();
 
@@ -74,14 +76,13 @@ if (isset($_GET['hapus'])) {
 
     <div class="border border-gray-300 rounded-lg overflow-hidden">
         <div class="max-h-[510px] overflow-y-auto">
-            <table class="w-full bg-white border border-gray-200">
+            <table class="w-full mb-20 bg-white border border-gray-200">
             <thead class="bg-blue-500 text-white sticky top-0 z-10">
     <tr>
         <th class="py-2 px-4 border">ID</th>
         <th class="py-2 px-4 border">Berupa</th>
         <th class="py-2 px-4 border">Ditunjukan</th>
         <th class="py-2 px-4 border">Hari/Tanggal</th>
-        <th class="py-2 px-4 border">Penerima</th>
         <th class="py-2 px-4 border">File</th>
         <th class="py-2 px-4 border">Aksi</th>
     </tr>
@@ -91,23 +92,19 @@ if (isset($_GET['hapus'])) {
     $no = 1;
     while ($row = $query->fetch_assoc()) : ?>
     <tr class="border-b hover:bg-gray-100 transition">
-        <td class="py-2 px-4 border text-center"><?php echo $no++; ?></td>
-        <td class="py-2 px-4 border"><?php echo nl2br($row['berupa']); ?></td>
-        <td class="py-2 px-4 border">
-    <?php echo (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . $row['nama_penerima']; ?>
-</td>
-
-        <td class="py-2 px-4 border text-center"><?php echo date('d-m-Y', strtotime($row['hari_tanggal'])); ?></td>
-        <td class="py-2 px-4 border"><?php echo $row['penerima']; ?></td>
-        <td class="py-2 px-4 border text-center">
-            <?php if (!empty($row['file_path'])): ?>
-                <a href="<?php echo $row['file_path']; ?>" target="_blank" class="text-blue-500 underline">
-                    File Tanda Terima
-                </a>
-            <?php else: ?>
-                <span class="text-gray-500">Tidak ada file</span>
-            <?php endif; ?>
-        </td>
+    <td class="py-2 px-4 border text-center"><?= $no++; ?></td>
+                         <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['berupa'])); ?></td>
+                        <td class="py-2 px-4 border">
+                            <?= (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . htmlspecialchars($row['nama_penerima']); ?>
+                        </td>
+                        <td class="py-2 px-4 border text-center"><?= date('d-m-Y', strtotime($row['hari_tanggal'])); ?></td>
+                        <td class="py-2 px-4 border text-center">
+                            <?php if (!empty($row['file_path'])): ?>
+                                <a href="<?= $row['file_path']; ?>" target="_blank" class="text-blue-500 underline">File Tanda Terima</a>
+                            <?php else: ?>
+                                <span class="text-gray-500">Tidak ada file</span>
+                            <?php endif; ?>
+                        </td>
         <td class="py-2 px-4 border text-center">
             <div class="flex flex-wrap justify-center gap-2 sm:flex-nowrap">
                 <a href="edit.php?id=<?php echo $row['id']; ?>" 
@@ -121,10 +118,10 @@ if (isset($_GET['hapus'])) {
                 </a>
             </div>
             <div class="mt-2 flex justify-center gap-2">
-                <a href="cetak_file.php?id=<?php echo $row['id']; ?>" target="_blank"
-                class="px-3 py-1 min-w-[80px] text-center bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow-md">
-                    Cetak
-                </a>
+            <a href="cetak_file.php?id=<?php echo sha1($row['id']); ?>" target="_blank"
+            class="px-3 py-1 min-w-[80px] text-center bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow-md">
+                Cetak
+            </a>        
                 <button onclick="openModal(<?php echo $row['id']; ?>)" 
                 class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
                     Upload

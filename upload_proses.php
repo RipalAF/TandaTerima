@@ -1,12 +1,10 @@
 <?php
 session_start();
-include './auth/koneksi.php'; // Pastikan koneksi sudah benar
-
+include './auth/koneksi.php'; 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = $_POST['id']; // ID penerima dari modal
-    $uploadDir = "uploads/"; // Folder penyimpanan file
+    $id = $_POST['id']; 
+    $uploadDir = "uploads/";
 
-    // Pastikan folder "uploads" ada, jika tidak buat baru
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }

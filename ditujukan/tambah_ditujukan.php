@@ -7,7 +7,6 @@ if (!isset($_SESSION['username'])) {
 
 include '../auth/koneksi.php';
 
-// Proses tambah data
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sebutan = $_POST['sebutan'];
     $nama_penerima = $_POST['nama_penerima'];
@@ -32,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Ditujukan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="../images/icon/favicon.png">
 </head>
 <body class="bg-gray-200 p-6">
     <div class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-2xl mt-20">

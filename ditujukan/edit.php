@@ -1,10 +1,8 @@
 <?php
 include '../auth/koneksi.php';
 
-// Ambil ID dari parameter URL
 $id = $_GET['id'] ?? '';
 
-// Ambil data dari database berdasarkan ID
 $query = "SELECT * FROM ditujukan WHERE id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $id);
@@ -12,20 +10,17 @@ $stmt->execute();
 $result = $stmt->get_result();
 $data = $result->fetch_assoc();
 
-// Jika data tidak ditemukan, redirect ke halaman utama
 if (!$data) {
     echo "<script>alert('Data tidak ditemukan!'); window.location='index.php';</script>";
     exit;
 }
 
-// Jika form disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sebutan = $_POST['sebutan'];
     $nama_penerima = $_POST['nama_penerima'];
     $divisi = $_POST['divisi'];
     $nama_perusahaan = $_POST['nama_perusahaan'];
 
-    // Update data dalam database
     $updateQuery = "UPDATE ditujukan SET sebutan=?, nama_penerima=?, divisi=?, nama_perusahaan=? WHERE id=?";
     $stmt = $conn->prepare($updateQuery);
     $stmt->bind_param("ssssi", $sebutan, $nama_penerima, $divisi, $nama_perusahaan, $id);
@@ -45,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Ditujukan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="../images/icon/favicon.png">
 </head>
 <body class="min-h-screen bg-gray-200 flex flex-col items-center p-6">
     <h2 class="text-3xl font-bold text-gray-700 mb-6">Edit Data Ditujukan</h2>
