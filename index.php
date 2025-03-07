@@ -77,13 +77,14 @@ if (isset($_GET['hapus'])) {
     <div class="border border-gray-300 rounded-lg overflow-hidden">
         <div class="max-h-[510px] overflow-y-auto">
             <table class="w-full mb-20 bg-white border border-gray-200">
-            <thead class="bg-blue-500 text-white sticky top-0 z-10">
+    <thead class="bg-blue-500 text-white sticky top-0 z-4">
     <tr>
         <th class="py-2 px-4 border">ID</th>
         <th class="py-2 px-4 border">Berupa</th>
-        <th class="py-2 px-4 border">Ditunjukan</th>
+        <th class="py-2 px-4 border">Ditujukan</th>
         <th class="py-2 px-4 border">Hari/Tanggal</th>
         <th class="py-2 px-4 border">File</th>
+        <th class="py-2 px-4 border">Doc Scan</th>  
         <th class="py-2 px-4 border">Aksi</th>
     </tr>
 </thead>
@@ -92,19 +93,26 @@ if (isset($_GET['hapus'])) {
     $no = 1;
     while ($row = $query->fetch_assoc()) : ?>
     <tr class="border-b hover:bg-gray-100 transition">
-    <td class="py-2 px-4 border text-center"><?= $no++; ?></td>
-                         <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['berupa'])); ?></td>
-                        <td class="py-2 px-4 border">
-                            <?= (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . htmlspecialchars($row['nama_penerima']); ?>
-                        </td>
-                        <td class="py-2 px-4 border text-center"><?= date('d-m-Y', strtotime($row['hari_tanggal'])); ?></td>
-                        <td class="py-2 px-4 border text-center">
-                            <?php if (!empty($row['file_path'])): ?>
-                                <a href="<?= $row['file_path']; ?>" target="_blank" class="text-blue-500 underline">File Tanda Terima</a>
-                            <?php else: ?>
-                                <span class="text-gray-500">Tidak ada file</span>
-                            <?php endif; ?>
-                        </td>
+        <td class="py-2 px-4 border text-center"><?= $no++; ?></td>
+        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['berupa'])); ?></td>
+        <td class="py-2 px-4 border">
+            <?= (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . htmlspecialchars($row['nama_penerima']); ?>
+        </td>
+        <td class="py-2 px-4 border text-center"><?= date('d-m-Y', strtotime($row['hari_tanggal'])); ?></td>
+        <td class="py-2 px-4 border text-center">
+            <?php if (!empty($row['file_path'])): ?>
+                <a href="<?= $row['file_path']; ?>" target="_blank" class="text-blue-500 underline">File Tanda Terima</a>
+            <?php else: ?>
+                <span class="text-gray-500">Tidak ada file</span>
+            <?php endif; ?>
+        </td>
+        <td class="py-2 px-4 border text-center">
+            <?php if (!empty($row['doc_scan_path'])): ?>
+                <a href="<?= $row['doc_scan_path']; ?>" target="_blank" class="text-green-500 underline">Doc Scan</a>
+            <?php else: ?>
+                <span class="text-gray-500">Tidak ada scan</span>
+            <?php endif; ?>
+        </td>
         <td class="py-2 px-4 border text-center">
             <div class="flex flex-wrap justify-center gap-2 sm:flex-nowrap">
                 <a href="edit.php?id=<?php echo $row['id']; ?>" 
@@ -118,14 +126,23 @@ if (isset($_GET['hapus'])) {
                 </a>
             </div>
             <div class="mt-2 flex justify-center gap-2">
-            <a href="cetak_file.php?id=<?php echo sha1($row['id']); ?>" target="_blank"
-            class="px-3 py-1 min-w-[80px] text-center bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow-md">
-                Cetak
-            </a>        
-                <button onclick="openModal(<?php echo $row['id']; ?>)" 
-                class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
-                    Upload
-                </button>
+                <a href="cetak_file.php?id=<?php echo sha1($row['id']); ?>" target="_blank"
+                class="px-3 py-1 min-w-[80px] text-center bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow-md">
+                    Cetak
+                </a>        
+
+                <!-- Tombol Upload menyesuaikan kondisi -->
+                <?php if (!empty($row['file_path'])): ?>
+                    <button onclick="openModal(<?php echo $row['id']; ?>, true)" 
+                    class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
+                        Upload
+                    </button>
+                <?php else: ?>
+                    <button onclick="openModal(<?php echo $row['id']; ?>, false)" 
+                    class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
+                        Upload
+                    </button>
+                <?php endif; ?>
             </div>
         </td>
     </tr>
@@ -135,17 +152,29 @@ if (isset($_GET['hapus'])) {
         </div>
     </div>
     <!-- Modal Upload -->
-    <div id="uploadModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-xl font-semibold mb-4">Upload File</h2>
-            <form action="upload_proses.php" method="POST" enctype="multipart/form-data">
+    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-lg font-bold mb-4">Upload File</h2>
+            <form action="upload_proses.php" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="uploadId">
-                <input type="file" name="file" required class="block w-full border p-2 rounded-md">
-                <div class="flex justify-end mt-4">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-400 text-white rounded-lg mr-2">
+                
+                <!-- Input File Tanda Terima -->
+                <div id="fileInputGroup">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">File Tanda Terima</label>
+                    <input type="file" name="file_tanda_terima" id="fileTandaTerima" class="block w-full border p-2 rounded-md">
+                </div>
+
+                <!-- Input Doc Scan -->
+                <div class="mt-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-900">Doc Scan</label>
+                    <input type="file" name="doc_scan" class="block w-full border p-2 rounded-md">
+                </div>
+
+                <div class="mt-4 flex justify-between">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500">
                         Batal
                     </button>
-                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                    <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
                         Upload
                     </button>
                 </div>
@@ -154,13 +183,24 @@ if (isset($_GET['hapus'])) {
     </div>
 
     <script>
-        function openModal(id) {    
-            document.getElementById('uploadId').value = id;
-            document.getElementById('uploadModal').classList.remove('hidden');
+    function openModal(id, fileExists) {    
+        document.getElementById('uploadId').value = id;
+
+        if (fileExists) {
+            document.getElementById('fileInputGroup').classList.add('hidden');
+            document.getElementById('fileTandaTerima').removeAttribute('required');
+        } else {
+            document.getElementById('fileInputGroup').classList.remove('hidden');
+            document.getElementById('fileTandaTerima').setAttribute('required', 'true');
         }
-        function closeModal() {
-            document.getElementById('uploadModal').classList.add('hidden');
-        }
-    </script>
+
+        document.getElementById('uploadModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('uploadModal').classList.add('hidden');
+    }
+</script>
+
 </body>
 </html>

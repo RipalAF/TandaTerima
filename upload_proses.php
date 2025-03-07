@@ -1,38 +1,54 @@
 <?php
-session_start();
-include './auth/koneksi.php'; 
+include './auth/koneksi.php';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id = $_POST['id']; 
-    $uploadDir = "uploads/";
+    $id = $_POST['id'];
 
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
+    // Ambil data dari database
+    $sql = "SELECT file_path FROM penerima WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
 
-    if (!empty($_FILES["file"]["name"])) {
-        $fileName = basename($_FILES["file"]["name"]);
-        $filePath = $uploadDir . time() . "_" . $fileName; // Rename dengan timestamp agar unik
+    $file_path = $row['file_path']; // Simpan data lama
 
-        // Cek apakah file berhasil diupload
-        if (move_uploaded_file($_FILES["file"]["tmp_name"], $filePath)) {
-            // Simpan path file ke database
-            $stmt = $conn->prepare("UPDATE penerima SET file_path = ? WHERE id = ?");
-            $stmt->bind_param("si", $filePath, $id);
+    // Jika file tanda terima sudah ada, hanya boleh upload Doc Scan
+    if (!empty($file_path)) {
+        if (!empty($_FILES['doc_scan']['name'])) {
+            $doc_scan = $_FILES['doc_scan']['name'];
+            $doc_scan_path = "uploads/" . basename($doc_scan);
+            move_uploaded_file($_FILES['doc_scan']['tmp_name'], $doc_scan_path);
 
-            if ($stmt->execute()) {
-                $_SESSION['message'] = "File berhasil diupload!";
-            } else {
-                $_SESSION['error'] = "Gagal menyimpan ke database!";
-            }
-        } else {
-            $_SESSION['error'] = "Gagal mengupload file!";
+            // Update hanya untuk Doc Scan
+            $sql = "UPDATE penerima SET doc_scan_path = ? WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("si", $doc_scan_path, $id);
+            $stmt->execute();
         }
     } else {
-        $_SESSION['error'] = "Tidak ada file yang dipilih!";
-    }
-}
+        // Jika belum ada file, bisa upload dua-duanya
+        if (!empty($_FILES['file_tanda_terima']['name'])) {
+            $file_tanda_terima = $_FILES['file_tanda_terima']['name'];
+            $file_path = "uploads/" . basename($file_tanda_terima);
+            move_uploaded_file($_FILES['file_tanda_terima']['tmp_name'], $file_path);
+        }
 
-// Redirect kembali ke halaman utama setelah upload
-header("Location: index.php");
-exit();
+        if (!empty($_FILES['doc_scan']['name'])) {
+            $doc_scan = $_FILES['doc_scan']['name'];
+            $doc_scan_path = "uploads/" . basename($doc_scan);
+            move_uploaded_file($_FILES['doc_scan']['tmp_name'], $doc_scan_path);
+        }
+
+        // Update database
+        $sql = "UPDATE penerima SET file_path = ?, doc_scan_path = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssi", $file_path, $doc_scan_path, $id);
+        $stmt->execute();
+    }
+
+    header("Location: index.php");
+    exit();
+}
 ?>

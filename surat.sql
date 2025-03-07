@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 26, 2025 at 09:35 AM
+-- Generation Time: Mar 07, 2025 at 04:10 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -55,15 +55,19 @@ CREATE TABLE `penerima` (
   `berupa` text NOT NULL,
   `ditunjukan` int DEFAULT NULL,
   `hari_tanggal` date NOT NULL,
-  `file_path` varchar(255) DEFAULT NULL
+  `file_path` varchar(255) DEFAULT NULL,
+  `doc_scan_path` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `penerima`
 --
 
-INSERT INTO `penerima` (`id`, `berupa`, `ditunjukan`, `hari_tanggal`, `file_path`) VALUES
-(34, 'ggg', 4, '2025-02-26', NULL);
+INSERT INTO `penerima` (`id`, `berupa`, `ditunjukan`, `hari_tanggal`, `file_path`, `doc_scan_path`) VALUES
+(37, 'Juli jelek', 1, '2025-03-07', 'uploads/IT.pdf', 'uploads/03_02_06_ND-B_ICT_2025.pdf'),
+(38, 'wdwe', 1, '2025-03-07', 'uploads/IT.pdf', 'uploads/sadsad.pdf'),
+(39, 'adsdsa', 4, '2025-03-07', 'uploads/IT.pdf', 'uploads/IT.pdf'),
+(40, 'Test', 1, '2025-03-07', 'uploads/IT.pdf', NULL);
 
 -- --------------------------------------------------------
 
@@ -121,7 +125,7 @@ ALTER TABLE `ditujukan`
 -- AUTO_INCREMENT for table `penerima`
 --
 ALTER TABLE `penerima`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `users`
