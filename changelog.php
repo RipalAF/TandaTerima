@@ -3,7 +3,8 @@ $repo_owner = 'RipalAF';
 $repo_name = 'TandaTerima';
 $api_url = "https://api.github.com/repos/$repo_owner/$repo_name/commits";
 
-// Ambil data dari GitHub
+date_default_timezone_set('Asia/Jakarta'); // Set zona waktu ke WIB
+
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $api_url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -31,14 +32,17 @@ $commits = json_decode($response, true);
                 <?php foreach ($commits as $commit): ?>
                     <?php
                     $message_lines = explode("\n", $commit['commit']['message']); 
-                    $version = trim($message_lines[0]); // Baris pertama sebagai versi (misal: v1.2.8)
-                    $description = isset($message_lines[1]) ? trim($message_lines[1]) : "Deskripsi tidak tersedia"; // Baris kedua sebagai deskripsi
+                    $version = trim($message_lines[0]);
+                    $description = isset($message_lines[1]) ? trim($message_lines[1]) : "Deskripsi tidak tersedia";
                     $author = $commit['commit']['author']['name'];
-                    $date = date('d M Y, H:i', strtotime($commit['commit']['author']['date']));
+
+                    $date = new DateTime($commit['commit']['author']['date']);
+                    $date->setTimezone(new DateTimeZone('Asia/Jakarta'));
+                    $formatted_date = $date->format('d M Y, H:i');
                     ?>
                     <li class="p-4 border-l-4 border-blue-500 bg-gray-50 shadow-md rounded-md">
                         <p class="text-lg font-semibold"><?= htmlspecialchars($version) ?></p>
-                        <p class="text-sm text-gray-600">Oleh <span class="font-bold"><?= htmlspecialchars($author) ?></span> pada <?= htmlspecialchars($date) ?></p>
+                        <p class="text-sm text-gray-600">Oleh <span class="font-bold"><?= htmlspecialchars($author) ?></span> pada <?= htmlspecialchars($formatted_date) ?> WIB</p>
                         <a href="<?= $commit['html_url'] ?>" target="_blank" class="text-blue-500 text-sm underline">Lihat di GitHub</a>
                     </li>
                 <?php endforeach; ?>
