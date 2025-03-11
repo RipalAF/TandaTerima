@@ -42,10 +42,12 @@ if (isset($_GET['hapus'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tanda Terima APP</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
     <link rel="icon" type="image/x-icon" href="images/icon/favicon.png">
     <link rel="apple-touch-icon" href="images/icon/apple-touch-icon.png">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col min-h-screen">
     <div class="flex items-center justify-between bg-white shadow-md p-4 rounded-lg">
         <h2 class="text-2xl font-bold text-gray-700">Tanda Terima</h2>
         <a href="logout.php" class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600">
@@ -53,7 +55,7 @@ if (isset($_GET['hapus'])) {
         </a>
     </div>
 
-    <div class="p-6">
+    <div class="flex-grow p-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
             <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
                 <a href="tambah.php" class="w-full sm:w-auto bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 text-center">
@@ -74,85 +76,85 @@ if (isset($_GET['hapus'])) {
         </div>
     </div>
 
-    <div class="border border-gray-300 rounded-lg overflow-hidden">
-        <div class="max-h-[510px] overflow-y-auto">
-            <table class="w-full mb-20 bg-white border border-gray-200">
-    <thead class="bg-blue-500 text-white sticky top-0 z-4">
-    <tr>
-        <th class="py-2 px-4 border">ID</th>
-        <th class="py-2 px-4 border">Berupa</th>
-        <th class="py-2 px-4 border">Ditujukan</th>
-        <th class="py-2 px-4 border">Hari/Tanggal</th>
-        <th class="py-2 px-4 border">File</th>
-        <th class="py-2 px-4 border">Doc Scan</th>  
-        <th class="py-2 px-4 border">Aksi</th>
-    </tr>
-</thead>
-<tbody>
-    <?php 
-    $no = 1;
-    while ($row = $query->fetch_assoc()) : ?>
-    <tr class="border-b hover:bg-gray-100 transition">
-        <td class="py-2 px-4 border text-center"><?= $no++; ?></td>
-        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['berupa'])); ?></td>
-        <td class="py-2 px-4 border">
-            <?= (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . htmlspecialchars($row['nama_penerima']); ?>
-        </td>
-        <td class="py-2 px-4 border text-center"><?= date('d-m-Y', strtotime($row['hari_tanggal'])); ?></td>
-        <td class="py-2 px-4 border text-center">
-            <?php if (!empty($row['file_path'])): ?>
-                <a href="<?= $row['file_path']; ?>" target="_blank" class="text-blue-500 underline">File Tanda Terima</a>
-            <?php else: ?>
-                <span class="text-gray-500">Tidak ada file</span>
-            <?php endif; ?>
-        </td>
-        <td class="py-2 px-4 border text-center">
-            <?php if (!empty($row['doc_scan_path'])): ?>
-                <a href="<?= $row['doc_scan_path']; ?>" target="_blank" class="text-green-500 underline">Doc Scan</a>
-            <?php else: ?>
-                <span class="text-gray-500">Tidak ada scan</span>
-            <?php endif; ?>
-        </td>
-        <td class="py-2 px-4 border text-center">
-            <div class="flex flex-wrap justify-center gap-2 sm:flex-nowrap">
-                <a href="edit.php?id=<?php echo $row['id']; ?>" 
-                class="px-3 py-1 min-w-[80px] text-center bg-yellow-500 text-white rounded-md hover:bg-yellow-600 shadow-md">
-                    Edit
-                </a>
-                <a href="?hapus=<?php echo $row['id']; ?>" 
-                onclick="return confirm('Yakin ingin menghapus?');"
-                class="px-3 py-1 min-w-[80px] text-center bg-red-500 text-white rounded-md hover:bg-red-600 shadow-md">
-                    Hapus
-                </a>
-            </div>
-            <div class="mt-2 flex justify-center gap-2">
-                <a href="cetak_file.php?id=<?php echo sha1($row['id']); ?>" target="_blank"
-                class="px-3 py-1 min-w-[80px] text-center bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow-md">
-                    Cetak
-                </a>        
-
-                <!-- Tombol Upload menyesuaikan kondisi -->
-                <?php if (!empty($row['file_path'])): ?>
-                    <button onclick="openModal(<?php echo $row['id']; ?>, true)" 
-                    class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
-                        Upload
-                    </button>
-                <?php else: ?>
-                    <button onclick="openModal(<?php echo $row['id']; ?>, false)" 
-                    class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
-                        Upload
-                    </button>
-                <?php endif; ?>
-            </div>
-        </td>
-    </tr>
-    <?php endwhile; ?>
-</tbody>
-</table>
+    <div class="border border-gray-300 rounded-lg overflow-hidden mb-56 min-h-[100px]">
+        <div class="max-h-[420px] overflow-y-auto relative">
+            <table class="w-full bg-white border border-gray-200">
+                <thead class="bg-blue-500 text-white sticky top-0 z-10 shadow-md">
+                    <tr>
+                        <th class="py-2 px-4 border">ID</th>
+                        <th class="py-2 px-4 border">Berupa</th>
+                        <th class="py-2 px-4 border">Ditujukan</th>
+                        <th class="py-2 px-4 border">Hari/Tanggal</th>
+                        <th class="py-2 px-4 border">Doc Scan</th>  
+                        <th class="py-2 px-4 border">File Tanda Terima</th>
+                        <th class="py-2 px-4 border">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    $no = 1;
+                    while ($row = $query->fetch_assoc()) : ?>
+                    <tr class="border-b hover:bg-gray-100 transition">
+                        <td class="py-2 px-4 border text-center"><?= $no++; ?></td>
+                        <td class="py-2 px-4 border"><?= nl2br(htmlspecialchars($row['berupa'])); ?></td>
+                        <td class="py-2 px-4 border">
+                            <?= (!empty($row['sebutan']) ? $row['sebutan'] . " " : "") . htmlspecialchars($row['nama_penerima']); ?>
+                        </td>
+                        <td class="py-2 px-4 border text-center">
+                            <?= date('d-m-Y', strtotime($row['hari_tanggal'])); ?>
+                        </td>
+                        <td class="py-2 px-4 border text-center">
+                            <?php if (!empty($row['doc_scan_path'])): ?>
+                                <a href="<?= $row['doc_scan_path']; ?>" target="_blank" class="text-green-500 underline">Doc Scan</a>
+                            <?php else: ?>
+                                <span class="text-gray-500">Tidak ada scan</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-2 px-4 border text-center">
+                            <?php if (!empty($row['file_path'])): ?>
+                                <a href="<?= $row['file_path']; ?>" target="_blank" class="text-blue-500 underline">File Tanda Terima</a>
+                            <?php else: ?>
+                                <span class="text-gray-500">Tidak ada file</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-2 px-4 border text-center">
+                            <div class="flex flex-wrap justify-center gap-2 sm:flex-nowrap">
+                                <a href="edit.php?id=<?php echo $row['id']; ?>" 
+                                class="px-3 py-1 min-w-[80px] text-center bg-yellow-500 text-white rounded-md hover:bg-yellow-600 shadow-md">
+                                    Edit
+                                </a>
+                                <a href="?hapus=<?php echo $row['id']; ?>" 
+                                onclick="return confirm('Yakin ingin menghapus?');"
+                                class="px-3 py-1 min-w-[80px] text-center bg-red-500 text-white rounded-md hover:bg-red-600 shadow-md">
+                                    Hapus
+                                </a>
+                            </div>
+                            <div class="mt-2 flex justify-center gap-2">
+                                <a href="cetak_file.php?id=<?php echo sha1($row['id']); ?>" target="_blank"
+                                class="px-3 py-1 min-w-[80px] text-center bg-blue-500 text-white rounded-md hover:bg-blue-600 shadow-md">
+                                    Cetak
+                                </a>        
+                                <?php if (!empty($row['file_path'])): ?>
+                                    <button onclick="openModal(<?php echo $row['id']; ?>, true)" 
+                                    class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
+                                        Upload
+                                    </button>
+                                <?php else: ?>
+                                    <button onclick="openModal(<?php echo $row['id']; ?>, false)" 
+                                    class="px-3 py-1 min-w-[80px] text-center bg-green-500 text-white rounded-md hover:bg-green-600 shadow-md">
+                                        Upload
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
     </div>
     <!-- Modal Upload -->
-    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden">
+    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 class="text-lg font-bold mb-4">Upload File</h2>
             <form action="upload_proses.php" method="post" enctype="multipart/form-data">
@@ -181,6 +183,11 @@ if (isset($_GET['hapus'])) {
             </form>
         </div>
     </div>
+
+    <footer class="text-center mt-4 text-gray-600 text-sm py-4 border-t bg-gray-100 shadow-md">
+        <p class="text-sm font-semibold"><i class="fas fa-copyright"></i> 2025 Dibuat oleh <span class="text-blue-500">Ahmad Rifal</span> - SMK Jakarta Pusat 1 - Div. Komersial TI</p>
+        <a href="changelog.php" class="font-semibold hover:text-blue-700 transition">Tanda Terima <span class="text-blue-500 font-semibold underline hover:text-blue-700 transition">APP v1.2.8</span></a>
+    </footer>
 
     <script>
     function openModal(id, fileExists) {    
