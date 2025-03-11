@@ -38,7 +38,6 @@ $commits = json_decode($response, true);
                     ?>
                     <li class="p-4 border-l-4 border-blue-500 bg-gray-50 shadow-md rounded-md">
                         <p class="text-lg font-semibold"><?= htmlspecialchars($version) ?></p>
-                        <p class="text-md text-gray-700"><?= htmlspecialchars($description) ?></p>
                         <p class="text-sm text-gray-600">Oleh <span class="font-bold"><?= htmlspecialchars($author) ?></span> pada <?= htmlspecialchars($date) ?></p>
                         <a href="<?= $commit['html_url'] ?>" target="_blank" class="text-blue-500 text-sm underline">Lihat di GitHub</a>
                     </li>
