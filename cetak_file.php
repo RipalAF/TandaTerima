@@ -68,39 +68,43 @@ function formatTanggalIndonesia($tanggal) {
             <img src="images/pid-logo.png" alt="Logo Kanan" class="h-24">
         </div>
         <div class="mt-4 p-4 rounded-lg">
-            <div class="flex items-center">
+            <div class="flex items-start">
                 <p class="text-sm font-semibold w-40">Telah Terima dari</p>
                 <p class="w-4 text-left text-sm">:</p>
                 <p class="text-sm flex-1">PT. PELITA INDONESIA DJAYA</p>
             </div>
-            <div class="flex items-center mt-2">
-                <p class="text-sm font-semibold w-40">Berupa</p>
-                <p class="w-4 text-left text-sm">:</p>
-                <p class="text-sm flex-1 print-text">
-                    <?php echo nl2br(htmlspecialchars($data['berupa'])); ?>
-                </p>
-            </div>
-            <div class="flex items-center mt-2">
+
+            <div class="flex items-start mt-2">
                 <p class="text-sm font-semibold w-40">Ditujukan kepada</p>
                 <p class="w-4 text-left text-sm">:</p>
                 <p class="text-sm flex-1">
                     <?php 
                         if (!empty($data['sebutan']) && !empty($data['nama_penerima']) && !empty($data['divisi']) && !empty($data['nama_perusahaan'])) {
-                            echo htmlspecialchars($data['sebutan']) . ' ' . htmlspecialchars($data['nama_penerima']) . ' - ' . htmlspecialchars($data['divisi']) . '  ' . htmlspecialchars($data['nama_perusahaan']);
+                            echo htmlspecialchars($data['sebutan']) . ' ' . htmlspecialchars($data['nama_penerima']) . ' - ' . htmlspecialchars($data['divisi']) . ' ' . htmlspecialchars($data['nama_perusahaan']);
                         } else {
                             echo 'Data tidak ditemukan';
                         }
                     ?>
                 </p>
             </div>
-            <div class="flex items-center mt-2">
+
+            <div class="flex items-start mt-2">
                 <p class="text-sm font-semibold w-40">Hari/Tanggal</p>
                 <p class="w-4 text-left text-sm">:</p>
                 <p class="text-sm flex-1">
                     <?php echo formatTanggalIndonesia($data['hari_tanggal']); ?>
                 </p>
             </div>
+
+            <div class="flex items-start mt-2">
+                <p class="text-sm font-semibold w-40">Berupa</p>
+                <p class="w-4 text-left text-sm">:</p>
+                <p class="text-sm flex-1">
+                    <?php echo nl2br(htmlspecialchars($data['berupa'])); ?>
+                </p>
+            </div>
         </div>
+
         <div class="mt-5 flex justify-end">
             <div class="text-center">
                 <p class="mb-28">Penerima,</p>

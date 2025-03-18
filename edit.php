@@ -8,7 +8,7 @@ if (!isset($_SESSION['username'])) {
 include './auth/koneksi.php';
 
 // Periksa apakah ada parameter ID yang dikirimkan
-if (!isset($_GET['id'])) {
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: index.php");
     exit();
 }
@@ -33,11 +33,14 @@ $ditujukan_result = $conn->query("SELECT id, nama_penerima FROM ditujukan");
 
 // Proses update data jika form dikirimkan
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $berupa = str_replace("\n", "<br>", $_POST['berupa']); // Simpan dengan format newline ke <br>
-    $ditunjukan = intval($_POST['ditunjukan']); // Pastikan ditujukan berupa angka
-    $hari_tanggal = $_POST['hari_tanggal'];
+    $berupa = $conn->real_escape_string($_POST['berupa']); // Escape input
+    $berupa = nl2br(htmlspecialchars($berupa)); // Simpan newline sebagai <br>
+    
+    $ditujukan = intval($_POST['ditunjukan']); // Pastikan berupa angka
+    $hari_tanggal = $conn->real_escape_string($_POST['hari_tanggal']);
 
-    $sql = "UPDATE penerima SET berupa='$berupa', ditunjukan='$ditunjukan', hari_tanggal='$hari_tanggal' WHERE id=$id";
+    // Update data
+    $sql = "UPDATE penerima SET berupa='$berupa', ditunjukan='$ditujukan', hari_tanggal='$hari_tanggal' WHERE id=$id";
     
     if ($conn->query($sql)) {
         header("Location: index.php");
@@ -66,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div>
                 <label class="block text-gray-700 font-semibold">Berupa:</label>
                 <textarea name="berupa" rows="4" required
-                    class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"><?= str_replace("<br>", "\n", htmlspecialchars($data['berupa'])); ?></textarea>
+                    class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"><?= htmlspecialchars_decode(str_replace("<br>", "\n", $data['berupa'])); ?></textarea>
             </div>
 
             <div>
@@ -74,9 +77,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <select name="ditunjukan" required class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <option value="">-- Pilih Ditujukan --</option>
                     <?php
-                    $result = $conn->query("SELECT id, nama_penerima FROM ditujukan");
-                    while ($row = $result->fetch_assoc()) {
-                        $selected = ($row['id'] == $data['ditunjukan']) ? "selected" : "";
+                    while ($row = $ditujukan_result->fetch_assoc()) {
+                        $selected = ($row['id'] == $data['id_ditujukan']) ? "selected" : "";
                         echo "<option value='{$row['id']}' $selected>{$row['nama_penerima']}</option>";
                     }
                     ?>
@@ -100,4 +102,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
     </div>
 </body>
-</html>
+</html> 
