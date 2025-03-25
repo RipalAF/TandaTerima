@@ -182,7 +182,7 @@ if (isset($_GET['hapus'])) {
 
     <footer class="text-center mt-4 text-gray-600 text-sm py-4 border-t bg-gray-100 shadow-md">
         <p class="text-sm font-semibold"><i class="fas fa-copyright"></i> 2025 Dibuat oleh <span class="text-blue-500">Ahmad Rifal</span> - SMK Jakarta Pusat 1 - Div. Komersial TI</p>
-        <a href="changelog.php" class="font-semibold hover:text-blue-700 transition">Tanda Terima <span class="text-blue-500 font-semibold underline hover:text-blue-700 transition">APP v1.3.2</span></a>
+        <a href="changelog.php" class="font-semibold hover:text-blue-700 transition">Tanda Terima <span class="text-blue-500 font-semibold underline hover:text-blue-700 transition">APP v1.3.3</span></a>
     </footer>
 
     <script>
